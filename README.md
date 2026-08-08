@@ -6,28 +6,60 @@ ELYNVIA is an AI-native ecosystem designed to turn human intentions into useful 
 
 The first product is **ELYNVIA Life** — *Your Life. Your Agent.*
 
-Long term, the ecosystem may include:
+## Current scope
 
-- ELYNVIA Life — personal AI agent
-- ELYNVIA Network — agent network and matching infrastructure
-- ELYNVIA Business — professional agents
-- ELYNVIA Trust — identity and reputation
-- ELYNVIA Pay — transactions
-- ELYNVIA ID — shared identity
-- ELYNVIA Protocol — open agent-to-agent communication
+Only the Life foundation is being implemented now. Network, Business, Trust, Pay and Protocol remain future products and must not add complexity to Life V1.
 
-## Repository structure
+## Repository
 
-- `docs/` — product, architecture, security and roadmap documentation
-- `apps/` — product applications such as ELYNVIA Life
-- `packages/` — shared packages
-- `supabase/` — database migrations and backend functions
-- `AGENTS.md` — rules for AI coding agents
+```text
+apps/life                 Next.js user experience
+packages/intents          shared Intent contract + validation
+supabase/migrations       canonical database history
+supabase/functions        future server-side Supabase functions
+docs                      product and technical source of truth
+AGENTS.md                  rules for AI coding agents
+```
 
-## Current phase
+## Backend
 
-**Phase 0 — Foundation**
+Supabase DEV project URL:
 
-The immediate goal is to define the product, architecture and development rules before implementation.
+`https://lrhrguotvznqeawoncch.supabase.co`
 
-The first technical milestone will be the **ELYNVIA Intent Engine**: convert a natural-language user request into a structured intent that can later be used by Life, Network and external agents.
+The URL is public configuration. Never commit service-role keys, database passwords or private API keys.
+
+The first migration creates only:
+
+- profiles
+- projects
+- conversations
+- messages
+- intents
+
+RLS is enabled on all five user-owned tables.
+
+## Local development
+
+Requirements: Node.js 22+, pnpm 10+, and optionally the Supabase CLI for local database work.
+
+```bash
+pnpm install
+cp .env.example apps/life/.env.local
+# Fill NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY with the project's public/publishable key.
+pnpm dev
+```
+
+Open `http://localhost:3000`.
+
+## Database workflow
+
+Database changes are never made as undocumented dashboard-only edits. Add migrations under `supabase/migrations/`, review them, then apply them to the intended environment.
+
+The initial remote migration has **not** been assumed applied until it is explicitly verified against Supabase DEV.
+
+## First milestone
+
+The first product capability is the **ELYNVIA Intent Engine**: convert natural-language requests into validated structured Intent objects, ask only useful follow-up questions, and persist the result safely.
+
+See `docs/INTENT_CONTRACT.md` and `packages/intents/src/index.ts`.
