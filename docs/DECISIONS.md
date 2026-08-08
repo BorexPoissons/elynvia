@@ -61,3 +61,9 @@ Important product/architecture decisions are recorded here so future contributor
 **Decision:** Browser code may use only the project's public/publishable Supabase credential. Privileged service credentials must never be shipped to the browser or committed.
 
 **Reason:** Authorization belongs in RLS/server boundaries, not in obscurity or client-side filtering.
+
+## 2026-08-09 — D011 — Bootstrap the first journey with a deterministic Intent Engine
+
+**Decision:** Before connecting a paid/generative AI provider, Life uses a small deterministic extractor behind the shared `Intent` contract to validate authentication, conversation persistence, RLS and the complete message-to-intent UX.
+
+**Reason:** This makes the product testable end-to-end without coupling the architecture to a model vendor. The deterministic extractor is explicitly temporary and will be replaced behind the same contract once the data path is verified.
