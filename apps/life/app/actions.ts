@@ -18,39 +18,23 @@ export async function submitIntent(
   const { data: authData, error: authError } = await supabase.auth.getUser();
   if (authError || !authData.user) redirect("/login?next=/");
 
-  const userId = authData.user.id;
   const parsed = extractIntentLocally(sourceText);
-
-  const { data: conversation, error: conversationError } = await supabase
-    .from("conversations")
-    .insert({ user_id: userId, title: parsed.summary.slice(0, 80) })
-    .select("id")
-    .single();
-
-  if (conversationError) return { error: "Impossible de créer la conversation. La migration Supabase est-elle appliquée ?" };
-
-  const { error: messageError } = await supabase.from("messages").insert({
-    user_id: userId,
-    conversation_id: conversation.id,
-    role: "user",
-    content: sourceText,
+  const { data, error } = await supabase.rpc("create_life_intent", {
+    p_title: parsed.summary.slice(0, 80),
+    p_source_text: sourceText,
+    p_type: parsed.type,
+    p_status: parsed.status,
+    p_summary: parsed.summary,
+    p_constraints: parsed.constraints,
+    p_missing_information: parsed.missingInformation,
+    p_confidence: parsed.confidence,
   });
-  if (messageError) return { error: "La conversation a été créée, mais le message n’a pas pu être enregistré." };
 
-  const { error: intentError } = await supabase.from("intents").insert({
-    user_id: userId,
-    conversation_id: conversation.id,
-    type: parsed.type,
-    status: parsed.status,
-    summary: parsed.summary,
-    constraints: parsed.constraints,
-    missing_information: parsed.missingInformation,
-    confidence: parsed.confidence,
-    source_text: parsed.sourceText,
-  });
-  if (intentError) return { error: "Le message est enregistré, mais l’intention n’a pas pu être créée." };
+  if (error || !data?.[0]?.conversation_id) {
+    return { error: "Impossible d’enregistrer cette intention. Vérifiez que les migrations Supabase sont appliquées." };
+  }
 
-  redirect(`/conversations/${conversation.id}`);
+  redirect(`/conversations/${data[0].conversation_id}`);
 }
 
 export async function signOut() {
