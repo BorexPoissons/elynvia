@@ -12,9 +12,10 @@ This roadmap is directional. Validate each phase before expanding scope.
 - [x] Establish AI-system baseline
 - [x] Establish security baseline
 - [x] Establish agent rules
-- [ ] Finalize initial monorepo tooling
-- [ ] Create Supabase DEV project/configuration
-- [ ] Define Intent contract v0.1
+- [x] Finalize initial monorepo tooling
+- [x] Create Supabase DEV project/configuration
+- [x] Define Intent contract v0.1
+- [ ] Apply and verify initial migration on remote Supabase DEV
 
 ## Phase 1 — ELYNVIA Life Core
 
