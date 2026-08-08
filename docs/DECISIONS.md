@@ -43,3 +43,21 @@ Important product/architecture decisions are recorded here so future contributor
 **Decision:** RLS, least privilege, user-controlled memory and explicit action permissions are architectural requirements.
 
 **Reason:** ELYNVIA's usefulness depends on access to personal context, making trust a core product requirement.
+
+## 2026-08-08 — D008 — Keep the first database intentionally small
+
+**Decision:** Life starts with only `profiles`, `projects`, `conversations`, `messages` and `intents` plus Supabase Auth.
+
+**Reason:** These tables support the first validated user journey without prematurely creating memory, payments, network or business infrastructure.
+
+## 2026-08-08 — D009 — Use pnpm/Turborepo for the initial monorepo
+
+**Decision:** Use pnpm workspaces with Turborepo, with `apps/life` and shared packages such as `packages/intents`.
+
+**Reason:** This keeps shared contracts reusable while retaining clear product boundaries and simple local development.
+
+## 2026-08-08 — D010 — Supabase browser access is publishable-key + RLS only
+
+**Decision:** Browser code may use only the project's public/publishable Supabase credential. Privileged service credentials must never be shipped to the browser or committed.
+
+**Reason:** Authorization belongs in RLS/server boundaries, not in obscurity or client-side filtering.
