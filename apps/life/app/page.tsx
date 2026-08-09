@@ -22,12 +22,12 @@ export default async function HomePage() {
         <div className="brandLockup"><span className="brandGlyph">✦</span><strong>ELYNVIA</strong></div>
         <nav className="mainNav" aria-label="Navigation principale">
           <Link className="navItem active" href="/">⌂ <span>Accueil</span></Link>
-          <span className="navItem disabled">◯ <span>Conversations</span></span>
-          <span className="navItem disabled">□ <span>Projets</span></span>
-          <span className="navItem disabled">◎ <span>Intentions</span></span>
+          <Link className="navItem" href="/conversations">◯ <span>Conversations</span></Link>
+          <Link className="navItem" href="/projects">□ <span>Projets</span></Link>
+          <Link className="navItem" href="/intents">◎ <span>Intentions</span></Link>
         </nav>
         <div className="sidebarSpacer" />
-        <div className="accountMini"><span className="avatar">{firstName.slice(0, 1).toUpperCase()}</span><div><strong>{firstName}</strong><small>ELYNVIA Life</small></div></div>
+        <Link className="accountMini" href="/profile"><span className="avatar">{firstName.slice(0, 1).toUpperCase()}</span><div><strong>{firstName}</strong><small>ELYNVIA Life · Profil</small></div></Link>
       </aside>
 
       <section className="workspace">
@@ -57,8 +57,8 @@ export default async function HomePage() {
           </section>
 
           <aside className="contextRail">
-            <section className="railCard"><div className="railTitle"><h3>Projets actifs</h3><span>{projects?.length ?? 0}</span></div>{projects?.length ? projects.map((project) => <div className="railRow" key={project.id}><strong>{project.title}</strong><small>{project.status}</small></div>) : <p className="emptyState">Vos projets apparaîtront ici quand une intention nécessitera plusieurs étapes.</p>}</section>
-            <section className="railCard"><div className="railTitle"><h3>Intentions récentes</h3><span>{intents?.length ?? 0}</span></div>{intents?.length ? intents.map((intent) => <Link className="railRow linkRow" href={`/conversations/${intent.conversation_id}`} key={intent.id}><strong>{intent.summary}</strong><small>{intent.type} · {intent.status}</small></Link>) : <p className="emptyState">Commencez par décrire ce que vous souhaitez accomplir.</p>}</section>
+            <section className="railCard"><div className="railTitle"><h3>Projets actifs</h3><Link href="/projects">Voir tout</Link></div>{projects?.length ? projects.map((project) => <Link className="railRow linkRow" href={`/projects/${project.id}`} key={project.id}><strong>{project.title}</strong><small>{project.status}</small></Link>) : <p className="emptyState">Vos projets apparaîtront ici quand une intention nécessitera plusieurs étapes.</p>}</section>
+            <section className="railCard"><div className="railTitle"><h3>Intentions récentes</h3><Link href="/intents">Voir tout</Link></div>{intents?.length ? intents.map((intent) => <Link className="railRow linkRow" href={`/intents/${intent.id}`} key={intent.id}><strong>{intent.summary}</strong><small>{intent.type} · {intent.status}</small></Link>) : <p className="emptyState">Commencez par décrire ce que vous souhaitez accomplir.</p>}</section>
             <section className="railCard memoryPreview"><div className="railTitle"><h3>Mémoire</h3><span>Plus tard</span></div><p>La mémoire personnelle sera ajoutée seulement avec des contrôles explicites pour consulter, modifier ou supprimer ce qui est retenu.</p></section>
           </aside>
         </div>
