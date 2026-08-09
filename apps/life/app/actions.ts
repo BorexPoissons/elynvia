@@ -1,8 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { extractIntentLocally } from "@/lib/intents/engine";
+import { extractIntentLocally, refineIntentLocally } from "@/lib/intents/engine";
 import { createClient } from "@/lib/supabase/server";
+import { parseIntent } from "@elynvia/intents";
 
 export type IntentActionState = { error?: string; success?: string };
 
@@ -35,6 +36,52 @@ export async function submitIntent(
   }
 
   redirect(`/conversations/${data[0].conversation_id}`);
+}
+
+export async function replyToIntent(formData: FormData) {
+  const conversationId = String(formData.get("conversation_id") ?? "");
+  const intentId = String(formData.get("intent_id") ?? "");
+  const reply = String(formData.get("reply") ?? "").trim();
+  if (!conversationId || !intentId || !reply) return;
+  if (reply.length > 10_000) return;
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: row } = await supabase
+    .from("intents")
+    .select("type,status,summary,constraints,missing_information,confidence,source_text")
+    .eq("id", intentId)
+    .eq("conversation_id", conversationId)
+    .single();
+  if (!row) redirect(`/conversations/${conversationId}`);
+
+  const current = parseIntent({
+    type: row.type,
+    status: row.status,
+    summary: row.summary,
+    constraints: row.constraints ?? {},
+    missingInformation: row.missing_information ?? [],
+    confidence: row.confidence == null ? undefined : Number(row.confidence),
+    sourceText: row.source_text ?? undefined,
+  });
+  const refined = refineIntentLocally(current, reply);
+
+  await supabase.rpc("reply_and_refresh_intent", {
+    p_conversation_id: conversationId,
+    p_intent_id: intentId,
+    p_reply: reply,
+    p_type: refined.type,
+    p_status: refined.status,
+    p_summary: refined.summary,
+    p_constraints: refined.constraints,
+    p_missing_information: refined.missingInformation,
+    p_confidence: refined.confidence,
+    p_source_text: refined.sourceText,
+  });
+
+  redirect(`/conversations/${conversationId}`);
 }
 
 export async function promoteIntentToProject(formData: FormData) {
