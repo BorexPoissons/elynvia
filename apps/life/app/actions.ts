@@ -37,6 +37,19 @@ export async function submitIntent(
   redirect(`/conversations/${data[0].conversation_id}`);
 }
 
+export async function promoteIntentToProject(formData: FormData) {
+  const intentId = String(formData.get("intent_id") ?? "");
+  const conversationId = String(formData.get("conversation_id") ?? "");
+  if (!intentId) return;
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  await supabase.rpc("promote_intent_to_project", { p_intent_id: intentId });
+  redirect(conversationId ? `/conversations/${conversationId}` : "/");
+}
+
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
