@@ -3,67 +3,53 @@
 Important product/architecture decisions are recorded here so future contributors and AI agents understand not only what exists, but why.
 
 ## 2026-08-08 — D001 — ELYNVIA is an ecosystem, not one monolithic product
-
 **Decision:** ELYNVIA is the parent brand. Life is the first product; Network, Business, Trust, Pay, ID and Protocol are potential distinct products/services.
-
 **Reason:** This allows independent evolution, security boundaries and business models while preserving a coherent ecosystem.
 
 ## 2026-08-08 — D002 — Build Life before Network
-
 **Decision:** ELYNVIA Life is the first implementation priority.
-
 **Reason:** Real Life usage can reveal which human intentions actually occur and therefore what Network should eventually support.
 
 ## 2026-08-08 — D003 — Intent is the first shared domain primitive
-
 **Decision:** Define a structured `Intent` contract before building broad agent/network functionality.
-
 **Reason:** The ecosystem depends on reliably translating human goals into machine-usable representations.
 
 ## 2026-08-08 — D004 — Use a monorepo initially
-
 **Decision:** Keep Life and shared packages in one repository, with explicit product boundaries.
-
 **Reason:** Early development benefits from shared types/tooling without requiring premature distributed-service complexity.
 
 ## 2026-08-08 — D005 — Supabase/PostgreSQL is the initial backend
-
 **Decision:** Use Supabase for the first backend and version database changes through migrations.
-
 **Reason:** It provides PostgreSQL, authentication, storage and RLS while keeping the core data model portable and inspectable.
 
 ## 2026-08-08 — D006 — AI providers must remain replaceable
-
 **Decision:** Product/domain logic will depend on an ELYNVIA AI abstraction rather than directly on one model vendor throughout the application.
-
 **Reason:** Model quality, price and capabilities evolve quickly. ELYNVIA must remain the durable product layer.
 
 ## 2026-08-08 — D007 — Privacy and security are foundational
-
 **Decision:** RLS, least privilege, user-controlled memory and explicit action permissions are architectural requirements.
-
 **Reason:** ELYNVIA's usefulness depends on access to personal context, making trust a core product requirement.
 
 ## 2026-08-08 — D008 — Keep the first database intentionally small
-
 **Decision:** Life starts with only `profiles`, `projects`, `conversations`, `messages` and `intents` plus Supabase Auth.
-
 **Reason:** These tables support the first validated user journey without prematurely creating memory, payments, network or business infrastructure.
 
 ## 2026-08-08 — D009 — Use pnpm/Turborepo for the initial monorepo
-
 **Decision:** Use pnpm workspaces with Turborepo, with `apps/life` and shared packages such as `packages/intents`.
-
 **Reason:** This keeps shared contracts reusable while retaining clear product boundaries and simple local development.
 
 ## 2026-08-08 — D010 — Supabase browser access is publishable-key + RLS only
-
 **Decision:** Browser code may use only the project's public/publishable Supabase credential. Privileged service credentials must never be shipped to the browser or committed.
-
 **Reason:** Authorization belongs in RLS/server boundaries, not in obscurity or client-side filtering.
 
 ## 2026-08-09 — D011 — Bootstrap the first journey with a deterministic Intent Engine
-
 **Decision:** Before connecting a paid/generative AI provider, Life uses a small deterministic extractor behind the shared `Intent` contract to validate authentication, conversation persistence, RLS and the complete message-to-intent UX.
-
 **Reason:** This makes the product testable end-to-end without coupling the architecture to a model vendor. The deterministic extractor is explicitly temporary and will be replaced behind the same contract once the data path is verified.
+
+## 2026-08-09 — D012 — English-first, international-by-design product UX
+**Decision:** English is the canonical/default ELYNVIA interface language. The product architecture supports English, French, German, Italian, Spanish, Portuguese, Dutch, Polish, Arabic, Chinese, Japanese, Korean and Hindi from the foundation. Arabic must be compatible with RTL layout. Interface language and future conversational-agent language are separate concerns.
+**Reason:** ELYNVIA is intended for international use. Internationalization must be an architectural concern rather than a late translation project.
+
+## 2026-08-09 — D013 — ELYNVIA visual direction is light, calm and premium
+**Decision:** Life uses a bright, spacious, human-centered visual system with restrained mint/teal and violet accents. Avoid a generic dark developer/SaaS dashboard aesthetic. Mobile is a first-class responsive experience.
+**Reason:** The desired mental model is “I’ll ask ELYNVIA,” not “open another AI developer tool.” The interface should feel trustworthy, approachable and distinct while preserving focus on human intentions.

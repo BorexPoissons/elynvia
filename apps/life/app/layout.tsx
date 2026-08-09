@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ELYNVIA Life",
-  description: "Your Life. Your Agent.",
+  title: "ELYNVIA Life — Your Life. Your Agent.",
+  description: "From intention to action. ELYNVIA understands what you want to accomplish and helps you move it forward.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fr">
+    <html lang="en" suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );
