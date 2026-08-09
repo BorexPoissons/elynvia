@@ -18,8 +18,7 @@ function inferBudget(text: string) {
   if (!match) return undefined;
   const amount = Number(match[1].replace(/[\s’'.]/g, ""));
   if (!Number.isFinite(amount)) return undefined;
-  const currency = /€|euro/i.test(match[2]) ? "EUR" : "CHF";
-  return { amount, currency };
+  return { amount, currency: /€|euro/i.test(match[2]) ? "EUR" : "CHF" };
 }
 
 function inferPeople(text: string) {
@@ -34,21 +33,25 @@ function inferDuration(text: string) {
   return match ? { value: Number(match[1]), unit: match[2].toLowerCase() } : undefined;
 }
 
-export function extractIntentLocally(sourceText: string): Intent {
-  const text = sourceText.trim();
-  const type = inferType(text);
+function inferDeparture(text: string) {
+  const match = text.match(/(?:depuis|de|départ\s+(?:de|depuis)?)\s*(Genève|Geneve|Lausanne|Zurich|Bâle|Bale)/i);
+  return match?.[1];
+}
+
+function buildIntent(text: string, forcedType?: string, baseConstraints: Record<string, unknown> = {}): Intent {
+  const type = forcedType && forcedType !== "general" ? forcedType : inferType(text);
+  const constraints: Record<string, unknown> = { ...baseConstraints };
   const budget = inferBudget(text);
   const people = inferPeople(text);
   const duration = inferDuration(text);
-  const constraints: Record<string, unknown> = {};
+  const departure = inferDeparture(text);
   if (budget) constraints.budget = budget;
   if (people) constraints.people = people;
   if (duration) constraints.duration = duration;
+  if (departure) constraints.departure_location = departure;
 
   const missingInformation: string[] = [];
-  if (type === "travel" && !/(genève|geneve|lausanne|zurich|bâle|bale|départ|depart)/i.test(text)) {
-    missingInformation.push("departure_location");
-  }
+  if (type === "travel" && !constraints.departure_location) missingInformation.push("departure_location");
 
   return parseIntent({
     type,
@@ -56,7 +59,16 @@ export function extractIntentLocally(sourceText: string): Intent {
     summary: text.length > 180 ? `${text.slice(0, 177)}…` : text,
     constraints,
     missingInformation,
-    confidence: type === "general" ? 0.45 : 0.72,
+    confidence: type === "general" ? 0.45 : missingInformation.length ? 0.72 : 0.82,
     sourceText: text,
   });
+}
+
+export function extractIntentLocally(sourceText: string): Intent {
+  return buildIntent(sourceText.trim());
+}
+
+export function refineIntentLocally(existing: Intent, reply: string): Intent {
+  const combinedSource = `${existing.sourceText ?? existing.summary}\n${reply.trim()}`.trim();
+  return buildIntent(combinedSource, existing.type, existing.constraints);
 }
