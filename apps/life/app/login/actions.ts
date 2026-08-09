@@ -14,21 +14,21 @@ function credentials(formData: FormData) {
 
 export async function login(_state: AuthState, formData: FormData): Promise<AuthState> {
   const { email, password } = credentials(formData);
-  if (!email || password.length < 8) return { error: "Saisissez un e-mail valide et un mot de passe d’au moins 8 caractères." };
+  if (!email || password.length < 8) return { error: "Enter a valid email and a password of at least 8 characters." };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { error: "Connexion impossible. Vérifiez vos identifiants." };
+  if (error) return { error: "We couldn't sign you in. Check your email and password." };
   redirect("/");
 }
 
 export async function signup(_state: AuthState, formData: FormData): Promise<AuthState> {
   const { email, password } = credentials(formData);
-  if (!email || password.length < 8) return { error: "Saisissez un e-mail valide et un mot de passe d’au moins 8 caractères." };
+  if (!email || password.length < 8) return { error: "Enter a valid email and a password of at least 8 characters." };
 
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({ email, password });
-  if (error) return { error: "Création du compte impossible pour le moment." };
-  if (!data.session) return { message: "Compte créé. Consultez votre e-mail pour confirmer votre adresse, puis connectez-vous." };
+  if (error) return { error: "We couldn't create your account right now. Please try again." };
+  if (!data.session) return { message: "Account created. Check your email to confirm your address, then sign in." };
   redirect("/");
 }
